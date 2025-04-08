@@ -8,6 +8,21 @@
 		<link rel="stylesheet" href="{% static "common/css/style.css" %}">
 	</head>
 	<body>
+		<div class="header">
+			<a href="{% url 'home' %}">Home</a>
+			<div class="right-header">
+				{% if request.user.is_authenticated %}
+					<span>{{ request.user }}</span>
+					<a href="">Ask a question</a>
+					<form action="{% url 'logout' %}" method="POST">
+						{% csrf_token %}
+						<button type="submit">Logout</button>
+					</form>
+				{% else %}
+					<a href="{% url 'login' %}">Login</a>
+				{% endif %}
+			</div>
+		</div>
 {% block main %}
 {% endblock %}
 	</body>

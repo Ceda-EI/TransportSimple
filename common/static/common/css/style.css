@@ -1,6 +1,33 @@
+.header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.right-header {
+	display: flex;
+	justify-content: space-evenly;
+	align-content: center;
+}
+
+.right-header > * {
+	margin-left: 15px;
+}
+
+.right-header button {
+	background: none;
+	border: none;
+	color: #eb5674;
+	font-size: 15px;
+}
+
+a {
+	color: #eb5674;
+	text-decoration: none;
+}
 body {
 	max-width: 800px;
 	margin: auto;
+	padding: 20px;
 }
 
 h1 {
