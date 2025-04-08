@@ -294,4 +294,4 @@ dist
 
 # Django
 media/
-static/
+/static/

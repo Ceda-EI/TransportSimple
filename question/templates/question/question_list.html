@@ -1,0 +1,13 @@
+{% extends "common/base.html" %}
+
+{% block main %}
+{% for question in object_list %}
+	<a href="{{ question.get_absolute_url }}">
+		<h2>{{ question.title }}</h2>
+	</a>
+	<div class="subtext">
+		<p class="likes">{{ question.num_likes }} likes</p>
+		<p class="author">{{ question.author }}</p>
+	</div>
+{% endfor %}
+{% endblock %}

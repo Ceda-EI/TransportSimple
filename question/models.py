@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 class Question(models.Model):
     title = models.CharField(max_length=255)
@@ -8,20 +9,29 @@ class Question(models.Model):
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        related_name="questions",
     )
 
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse("question", args=(self.slug,))
+
+    @property
+    def num_likes(self):
+        return self.likes.aggregate(num=models.Count('author'))['num']
 
 class Answer(models.Model):
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
+        related_name="answers",
     )
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        related_name="answers",
     )
     body = models.TextField()
 
@@ -33,10 +43,12 @@ class Like(models.Model):
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
+        related_name="likes",
     )
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
+        related_name="likes",
     )
 
     def __str__(self):

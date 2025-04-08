@@ -1,0 +1,26 @@
+body {
+	max-width: 800px;
+	margin: auto;
+}
+
+h1 {
+	font-size: 22px;
+}
+
+h2 {
+	font-size: 18px;
+}
+
+.author {
+	color: #777;
+}
+
+.subtext {
+	display: flex;
+	justify-content: space-between;
+	width: 200px;
+}
+
+.likes {
+	color: #a63b26;
+}
