@@ -6,7 +6,7 @@
 		<h2>{{ question.title }}</h2>
 	</a>
 	<div class="subtext">
-		<p class="likes">{{ question.num_likes }} likes</p>
+		<p class="likes">{{ question.num_likes }} like{{ question.num_likes | pluralize }}</p>
 		<p class="author">{{ question.author }}</p>
 	</div>
 {% endfor %}

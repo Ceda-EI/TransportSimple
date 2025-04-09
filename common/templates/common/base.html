@@ -13,7 +13,7 @@
 			<div class="right-header">
 				{% if request.user.is_authenticated %}
 					<span>{{ request.user }}</span>
-					<a href="">Ask a question</a>
+					<a href="{% url 'ask-question' %}">Ask a question</a>
 					<form action="{% url 'logout' %}?next={{ request.path }}" method="POST">
 						{% csrf_token %}
 						<button type="submit">Logout</button>

@@ -1,8 +1,11 @@
+import time
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import DetailView, FormView, ListView, View
+from django.template.defaultfilters import slugify
+from django.views.generic import CreateView, DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 
 from question.models import Answer, Like, Question
@@ -41,6 +44,7 @@ class AnswerView(LoginRequiredMixin, SingleObjectMixin, FormView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
+        breakpoint()
         answer = form.save(commit=False)
         answer.author = self.request.user
         answer.question = self.object
@@ -65,3 +69,35 @@ class ToggleLikeView(LoginRequiredMixin, SingleObjectMixin, View):
                 question=self.object
             )
         return HttpResponseRedirect(self.object.get_absolute_url())
+
+
+class CreateQuestionView(LoginRequiredMixin, CreateView):
+    model = Question
+    fields = ["title", "body"]
+
+
+    def _get_unique_slug(self, title):
+        max_length: int = Question._meta.get_field('slug').max_length
+        slug = slugify(title[:max_length])
+        if not Question.objects.filter(slug=slug).count():
+            return slug
+
+        slug = slug[:max_length - 1]
+
+        # Try suffixing 0 - 9 first
+        for i in range(10):
+            slug = slug + str(i)
+            if not Question.objects.filter(slug=slug).count():
+                return slug
+
+        # Suffix timestamp else
+        timestamp = f"{time.time():.2f}"
+        return slugify(title[:max_length - len(timestamp)] + timestamp)
+
+
+    def form_valid(self, form):
+        self.object = question = form.save(commit=False)
+        question.author = self.request.user
+        question.slug = self._get_unique_slug(question.title)
+        question.save()
+        return super().form_valid(form)

@@ -1,0 +1,17 @@
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block title %}Ask a Question | TransportSimple{% endblock %}
+
+{% block main %}
+    <div class="body">
+        <h1>Ask a Question</h1>
+        <div class="login">
+            <form action="{% url 'ask-question' %}" method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+{% endblock %}
