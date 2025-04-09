@@ -1,0 +1,17 @@
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block title %}Create Account | TransportSimple{% endblock %}
+
+{% block main %}
+    <div class="body">
+        <h1>Create User</h1>
+        <div class="login">
+            <form action="{% url 'create-user' %}" method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+{% endblock %}
