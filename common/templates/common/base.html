@@ -14,12 +14,12 @@
 				{% if request.user.is_authenticated %}
 					<span>{{ request.user }}</span>
 					<a href="">Ask a question</a>
-					<form action="{% url 'logout' %}" method="POST">
+					<form action="{% url 'logout' %}?next={{ request.path }}" method="POST">
 						{% csrf_token %}
 						<button type="submit">Logout</button>
 					</form>
 				{% else %}
-					<a href="{% url 'login' %}">Login</a>
+					<a href="{% url 'login' %}?next={{ request.path }}">Login</a>
 					<a href="{% url 'create-user' %}">Create Account</a>
 				{% endif %}
 			</div>
