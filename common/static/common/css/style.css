@@ -1,3 +1,38 @@
+* {
+	box-sizing: border-box;
+}
+
+form > div {
+	width: 100%;
+}
+
+form input, form textarea, form label {
+	width: 100%;
+	margin: 10px 0;
+	padding: 10px;
+}
+
+
+form input, form textarea {
+	border-radius: 4px;
+	border: solid 1px #333;
+}
+
+form textarea {
+	resize: vertical;
+}
+
+form button[type="submit"] {
+	width: 50%;
+	min-width: 150px;
+	padding: 10px;
+	margin: 5px auto;
+	background-color: #a63b26;
+	border-radius: 4px;
+	border: none;
+	color: #FFF;
+}
+
 .header {
 	display: flex;
 	justify-content: space-between;
@@ -13,11 +48,15 @@
 	margin-left: 15px;
 }
 
-.right-header button {
+.right-header form button[type="submit"] {
 	background: none;
 	border: none;
 	color: #eb5674;
 	font-size: 15px;
+	margin: 0;
+	padding: 0;
+	width: auto;
+	min-width: auto;
 }
 
 a {
