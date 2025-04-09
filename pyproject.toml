@@ -11,4 +11,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "django-stubs>=5.1.3",
+    "ipdb>=0.13.13",
 ]
