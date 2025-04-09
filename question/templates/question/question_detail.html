@@ -13,6 +13,20 @@
 	{{ question.body|linebreaks }}
 </div>
 
+{% if request.user.is_authenticated %}
+<form action="{% url 'like' question.slug %}" method="POST">
+	{% csrf_token %}
+	<button type="submit">{{ liked|yesno:"Unlike,Like"}}</button>
+</form>
+
+<h2>Add answer</h2>
+<form action="{% url 'answer' question.slug %}" method="POST">
+	{% csrf_token %}
+	{{ answer_form }}
+	<button type="submit">Add Answer</button>
+</form>
+{% endif %}
+
 {% for answer in question.answers.all %}
 	<h2>Answer by {{ question.author }}</h2>
 	{{ answer.body | linebreaks }}
