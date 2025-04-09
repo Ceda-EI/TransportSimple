@@ -22,6 +22,7 @@ class Question(models.Model):
     def num_likes(self):
         return self.likes.aggregate(num=models.Count('author'))['num']
 
+
 class Answer(models.Model):
     question = models.ForeignKey(
         Question,
@@ -37,6 +38,10 @@ class Answer(models.Model):
 
     def __str__(self):
         return f"{self.author}'s answer of {self.question}"
+
+    @property
+    def num_likes(self):
+        return self.likes.aggregate(num=models.Count('author'))['num']
 
 
 class Like(models.Model):
@@ -56,3 +61,23 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ("question", "author")
+
+
+class AnswerLike(models.Model):
+    answer = models.ForeignKey(
+        Answer,
+        on_delete=models.CASCADE,
+        related_name="likes",
+    )
+    author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="answer_likes",
+    )
+
+    def __str__(self):
+        return f"{self.author}: {self.answer}"
+
+    class Meta:
+        unique_together = ("answer", "author")
+

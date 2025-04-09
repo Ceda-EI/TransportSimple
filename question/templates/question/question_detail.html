@@ -27,8 +27,18 @@
 </form>
 {% endif %}
 
-{% for answer in question.answers.all %}
-	<h2>Answer by {{ answer.author }}</h2>
+{% for answer in answers %}
+	<h2>Answer</h2>
+	<div class="subtext">
+		<p class="likes">{{ answer.num_likes }} like{{ answer.num_likes | pluralize }}</p>
+		<p class="author">{{ answer.author }}</p>
+	</div>
+	{% if request.user.is_authenticated %}
+	<form action="{% url 'answer-like' answer.id %}" method="POST">
+		{% csrf_token %}
+		<button type="submit">{{ answer.liked|yesno:"Unlike,Like"}}</button>
+	</form>
+	{% endif %}
 	{{ answer.body | linebreaks }}
 {% endfor %}
 {% endblock %}

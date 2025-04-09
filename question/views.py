@@ -3,12 +3,13 @@ import time
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Exists, OuterRef
 from django.http import HttpResponseRedirect
 from django.template.defaultfilters import slugify
 from django.views.generic import CreateView, DetailView, FormView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
 
-from question.models import Answer, Like, Question
+from question.models import Answer, AnswerLike, Like, Question
 
 
 class QuestionsView(ListView):
@@ -28,8 +29,10 @@ class QuestionView(DetailView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['answer_form'] = AnswerForm
+        ctx['answers'] = None
         if self.request.user.is_authenticated:
             ctx['liked'] = Like.objects.filter(author=self.request.user, question=self.object).count() > 0
+            ctx['answers'] = self.object.answers.all().annotate(liked=Exists(AnswerLike.objects.filter(answer=OuterRef('pk'), author=self.request.user)))
         else:
             ctx['liked'] = False
         return ctx
@@ -69,6 +72,21 @@ class ToggleLikeView(LoginRequiredMixin, SingleObjectMixin, View):
                 question=self.object
             )
         return HttpResponseRedirect(self.object.get_absolute_url())
+
+
+class ToggleAnswerLikeView(LoginRequiredMixin, SingleObjectMixin, View):
+    model = Answer
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if like := AnswerLike.objects.filter(author=self.request.user, answer=self.object).first():
+            like.delete()
+        else:
+            AnswerLike.objects.create(
+                author=self.request.user,
+                answer=self.object
+            )
+        return HttpResponseRedirect(self.object.question.get_absolute_url())
 
 
 class CreateQuestionView(LoginRequiredMixin, CreateView):
