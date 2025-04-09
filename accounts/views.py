@@ -6,6 +6,7 @@ from django.views.generic.edit import FormView
 
 # Create your views here.
 
+
 class CreateUserView(FormView):
     form_class = UserCreationForm
     template_name = "registration/create-user.html"

@@ -19,7 +19,7 @@ class QuestionsView(ListView):
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
-        fields = ['body']
+        fields = ["body"]
 
 
 class QuestionView(DetailView):
@@ -28,13 +28,24 @@ class QuestionView(DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['answer_form'] = AnswerForm
-        ctx['answers'] = None
+        ctx["answer_form"] = AnswerForm
+        ctx["answers"] = answers = self.object.answers.all()
         if self.request.user.is_authenticated:
-            ctx['liked'] = Like.objects.filter(author=self.request.user, question=self.object).count() > 0
-            ctx['answers'] = self.object.answers.all().annotate(liked=Exists(AnswerLike.objects.filter(answer=OuterRef('pk'), author=self.request.user)))
+            ctx["liked"] = (
+                Like.objects.filter(
+                    author=self.request.user, question=self.object
+                ).count()
+                > 0
+            )
+            ctx["answers"] = answers.annotate(
+                liked=Exists(
+                    AnswerLike.objects.filter(
+                        answer=OuterRef("pk"), author=self.request.user
+                    )
+                )
+            )
         else:
-            ctx['liked'] = False
+            ctx["liked"] = False
         return ctx
 
 
@@ -52,7 +63,7 @@ class AnswerView(LoginRequiredMixin, SingleObjectMixin, FormView):
         answer.author = self.request.user
         answer.question = self.object
         answer.save()
-        messages.success(self.request, 'Added answer')
+        messages.success(self.request, "Added answer")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -64,13 +75,12 @@ class ToggleLikeView(LoginRequiredMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if like := Like.objects.filter(author=self.request.user, question=self.object).first():
+        if like := Like.objects.filter(
+            author=self.request.user, question=self.object
+        ).first():
             like.delete()
         else:
-            Like.objects.create(
-                author=self.request.user,
-                question=self.object
-            )
+            Like.objects.create(author=self.request.user, question=self.object)
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
@@ -79,13 +89,12 @@ class ToggleAnswerLikeView(LoginRequiredMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if like := AnswerLike.objects.filter(author=self.request.user, answer=self.object).first():
+        if like := AnswerLike.objects.filter(
+            author=self.request.user, answer=self.object
+        ).first():
             like.delete()
         else:
-            AnswerLike.objects.create(
-                author=self.request.user,
-                answer=self.object
-            )
+            AnswerLike.objects.create(author=self.request.user, answer=self.object)
         return HttpResponseRedirect(self.object.question.get_absolute_url())
 
 
@@ -93,14 +102,13 @@ class CreateQuestionView(LoginRequiredMixin, CreateView):
     model = Question
     fields = ["title", "body"]
 
-
     def _get_unique_slug(self, title):
-        max_length: int = Question._meta.get_field('slug').max_length
+        max_length: int = Question._meta.get_field("slug").max_length
         slug = slugify(title[:max_length])
         if not Question.objects.filter(slug=slug).count():
             return slug
 
-        slug = slug[:max_length - 1]
+        slug = slug[: max_length - 1]
 
         # Try suffixing 0 - 9 first
         for i in range(10):
@@ -110,8 +118,7 @@ class CreateQuestionView(LoginRequiredMixin, CreateView):
 
         # Suffix timestamp else
         timestamp = f"{time.time():.2f}"
-        return slugify(title[:max_length - len(timestamp)] + timestamp)
-
+        return slugify(title[: max_length - len(timestamp)] + timestamp)
 
     def form_valid(self, form):
         self.object = question = form.save(commit=False)

@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.urls import reverse
+
 
 class Question(models.Model):
     title = models.CharField(max_length=255)
@@ -12,15 +13,15 @@ class Question(models.Model):
         related_name="questions",
     )
 
-    def __str__(self):
-        return self.title
-
     def get_absolute_url(self):
         return reverse("question", args=(self.slug,))
 
     @property
     def num_likes(self):
-        return self.likes.aggregate(num=models.Count('author'))['num']
+        return self.likes.aggregate(num=models.Count("author"))["num"]
+
+    def __str__(self):
+        return self.title
 
 
 class Answer(models.Model):
@@ -36,15 +37,19 @@ class Answer(models.Model):
     )
     body = models.TextField()
 
+    @property
+    def num_likes(self):
+        return self.likes.aggregate(num=models.Count("author"))["num"]
+
     def __str__(self):
         return f"{self.author}'s answer of {self.question}"
 
-    @property
-    def num_likes(self):
-        return self.likes.aggregate(num=models.Count('author'))['num']
-
 
 class Like(models.Model):
+
+    class Meta:
+        unique_together = ("question", "author")
+
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
@@ -59,11 +64,12 @@ class Like(models.Model):
     def __str__(self):
         return f"{self.author}: {self.question}"
 
-    class Meta:
-        unique_together = ("question", "author")
-
 
 class AnswerLike(models.Model):
+
+    class Meta:
+        unique_together = ("answer", "author")
+
     answer = models.ForeignKey(
         Answer,
         on_delete=models.CASCADE,
@@ -77,7 +83,3 @@ class AnswerLike(models.Model):
 
     def __str__(self):
         return f"{self.author}: {self.answer}"
-
-    class Meta:
-        unique_together = ("answer", "author")
-
